@@ -12,7 +12,6 @@ public class StartTrackingLink implements ChatStateAction {
 
         try {
             if (LinkParser.isReachableUrl(link)) {
-                System.out.println(LinkParser.isReachableUrl(link));
                 linkRepo.saveLink(chatId, link);
                 return true;
             }

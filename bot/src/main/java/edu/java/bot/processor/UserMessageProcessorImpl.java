@@ -23,10 +23,7 @@ public class UserMessageProcessorImpl implements UserMessageProcessor {
     private final HashMap<ChatState, ChatStateAction> commandExecutor;
 
     public UserMessageProcessorImpl(
-        List<Command> commands,
-        ChatStateRepo chatStateRepo,
-        LinkRepo linkRepo,
-        ApplicationContext applicationContext
+        List<Command> commands, ChatStateRepo chatStateRepo, LinkRepo linkRepo, ApplicationContext applicationContext
     ) {
         this.commands = commands;
         this.chatStateRepo = chatStateRepo;
@@ -38,13 +35,11 @@ public class UserMessageProcessorImpl implements UserMessageProcessor {
         commandExecutor.put(ChatState.WAITING_FOR_LINK_TO_UNTRACK, new StopTrackingLink());
     }
 
-    @Override
-    public List<? extends Command> commands() {
+    @Override public List<? extends Command> commands() {
         return commands;
     }
 
-    @Override
-    public SendMessage process(Update update) {
+    @Override public SendMessage process(Update update) {
         Long chatId = update.message().chat().id();
 
         if (!chatStateRepo.containsChatState(chatId)) {
@@ -63,19 +58,19 @@ public class UserMessageProcessorImpl implements UserMessageProcessor {
         ChatStateAction chatStateAction = commandExecutor.get(chatStateRepo.findByChatId(chatId));
 
         if (chatStateAction != null) {
-            boolean isCorrectlyExecuted = chatStateAction.execute(chatStateRepo, linkRepo, chatId, update.message().text());
+            boolean isCorrectlyExecuted =
+                chatStateAction.execute(chatStateRepo, linkRepo, chatId, update.message().text());
 
             if (isCorrectlyExecuted) {
                 return new SendMessage(update.message().chat().id(), "Job is done.");
             }
         }
 
-        String replyText = chatStateRepo.findByChatId(chatId).equals(ChatState.WAITING_FOR_START)
-            ? "/start to start using."
-            : "Unknown command.\nUse /help for commands list.";
+        String replyText =
+            chatStateRepo.findByChatId(chatId).equals(ChatState.WAITING_FOR_START) ? "/start to start using." :
+                "Unknown command.\nUse /help for commands list.";
 
-        return new SendMessage(
-            update.message().chat().id(),
+        return new SendMessage(update.message().chat().id(),
             replyText
         ).replyMarkup(this.keyboard.getReplyKeyboardMarkup());
     }

@@ -8,8 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
-@Component
-@AllArgsConstructor
+@Component @AllArgsConstructor
 public class CommandsKeyboard {
 
     private final ApplicationContext applicationContext;
