@@ -3,10 +3,10 @@ package edu.java.bot.utility;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import edu.java.bot.command.Command;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
 
 @Component @AllArgsConstructor
 public class CommandsKeyboard {

@@ -7,8 +7,8 @@ import edu.java.bot.repo.ChatStateRepo;
 import edu.java.bot.repo.LinkRepo;
 import edu.java.bot.state.ChatState;
 import edu.java.bot.utility.CommandsKeyboard;
-import org.springframework.context.ApplicationContext;
 import java.util.HashMap;
+import org.springframework.context.ApplicationContext;
 import java.util.List;
 
 public class UserMessageProcessorImpl implements UserMessageProcessor {
@@ -67,8 +67,8 @@ public class UserMessageProcessorImpl implements UserMessageProcessor {
         }
 
         String replyText =
-            chatStateRepo.findByChatId(chatId).equals(ChatState.WAITING_FOR_START) ? "/start to start using." :
-                "Unknown command.\nUse /help for commands list.";
+            chatStateRepo.findByChatId(chatId).equals(ChatState.WAITING_FOR_START) ? "/start to start using."
+                : "Unknown command.\nUse /help for commands list.";
 
         return new SendMessage(update.message().chat().id(),
             replyText

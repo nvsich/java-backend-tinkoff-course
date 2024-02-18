@@ -1,9 +1,9 @@
 package edu.java.bot.repo;
 
 import edu.java.bot.state.ChatState;
+import java.util.HashMap;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import java.util.HashMap;
 
 @Component
 @AllArgsConstructor
