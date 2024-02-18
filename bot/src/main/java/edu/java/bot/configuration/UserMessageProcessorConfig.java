@@ -5,10 +5,10 @@ import edu.java.bot.processor.UserMessageProcessor;
 import edu.java.bot.processor.UserMessageProcessorImpl;
 import edu.java.bot.repo.ChatStateRepo;
 import edu.java.bot.repo.LinkRepo;
+import java.util.List;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.util.List;
 
 @Configuration
 public class UserMessageProcessorConfig {

@@ -8,8 +8,8 @@ import edu.java.bot.repo.LinkRepo;
 import edu.java.bot.state.ChatState;
 import edu.java.bot.utility.CommandsKeyboard;
 import java.util.HashMap;
-import org.springframework.context.ApplicationContext;
 import java.util.List;
+import org.springframework.context.ApplicationContext;
 
 public class UserMessageProcessorImpl implements UserMessageProcessor {
     private final List<Command> commands;
