@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 @Component
 public class LinkUpdaterScheduler {
-    private static final Logger logger = LoggerFactory.getLogger(LinkUpdaterScheduler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkUpdaterScheduler.class);
 
     @Scheduled(fixedDelayString = "#{@schedulerInterval.toMillis()}")
     public void update() {
-        logger.info("LinkUpdaterScheduler#update() stub called");
+        LOGGER.info("LinkUpdaterScheduler#update() stub called");
     }
 }
