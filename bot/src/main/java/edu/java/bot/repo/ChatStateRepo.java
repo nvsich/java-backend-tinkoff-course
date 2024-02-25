@@ -1,12 +1,12 @@
 package edu.java.bot.repo;
 
-import edu.java.bot.state.ChatState;
+import edu.java.bot.entity.ChatState;
+import java.util.Optional;
 
 public interface ChatStateRepo {
 
-    boolean containsChatState(Long chatId);
+    Optional<ChatState> findById(Long id);
 
-    ChatState findByChatId(Long chatId);
+    void save(Long id, ChatState chatState);
 
-    void setChatStateByChatId(Long chatId, ChatState chatState);
 }

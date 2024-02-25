@@ -1,12 +1,14 @@
 package edu.java.bot.repo;
 
+import edu.java.bot.entity.Link;
 import java.util.List;
 
 public interface LinkRepo {
 
-    void saveLink(Long chatId, String url);
+    List<Link> findAllById(Iterable<Long> id);
 
-    void deleteLink(Long chatId, String url);
+    void save(Link link);
 
-    List<String> getAll(Long chatId);
+    void deleteById(Long linkId);
+
 }
