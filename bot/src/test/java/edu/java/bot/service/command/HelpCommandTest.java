@@ -28,10 +28,9 @@ class HelpCommandTest {
     @Test
     @DisplayName("Should send message to the same chat")
     void handleTest() {
-        MessageRequest mockRequest = mock(MessageRequest.class);
-
         Long chatId = 1L;
-        when(mockRequest.getChatId()).thenReturn(chatId);
+        String helpResponse = "";
+        MessageRequest mockRequest = new MessageRequest(chatId, helpResponse);
 
         MessageResponse actualResponse = helpCommand.handle(mockRequest);
 

@@ -145,7 +145,7 @@ class TrackCommandTest {
         Long tLinkId = 123L;
 
         when(mockLink.getId()).thenReturn(tLinkId);
-        when(mockLink.getLinkDomain()).thenReturn(LinkDomain.GitHub);
+        when(mockLink.getLinkDomain()).thenReturn(LinkDomain.GITHUB);
 
         when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
             .thenReturn(Optional.of(tChatState));

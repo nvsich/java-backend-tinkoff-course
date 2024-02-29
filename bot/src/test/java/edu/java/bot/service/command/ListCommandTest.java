@@ -77,7 +77,7 @@ class ListCommandTest {
         ChatState mockChatState = mock(ChatState.class);
 
         Long linkId = 2L;
-        LinkDomain tDomain = LinkDomain.GitHub;
+        LinkDomain tDomain = LinkDomain.GITHUB;
         String tUrl = "tUrl";
 
         Link tLink = new Link();
