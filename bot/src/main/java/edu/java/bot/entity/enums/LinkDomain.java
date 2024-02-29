@@ -4,25 +4,35 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum LinkDomain {
-    GitHub {
+    GITHUB {
+        private final String regex = "^(https?://)?github\\.com/[^/]+/[^/]+/?$";
+        private final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
         @Override
         public boolean isDomainForUrl(String url) {
-            String regex = "^(https?://)?github\\.com/[^/]+/[^/]+/?$";
-            Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(url);
-
             return matcher.matches();
+        }
+
+        @Override
+        public String toString() {
+            return "GitHub";
         }
     },
 
-    StackOverflow {
+    STACKOVERFLOW {
+        private final String regex = "^(https?://)?stackoverflow\\.com/questions/(\\d+)+/[^/]+/?$";
+        private final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        
         @Override
         public boolean isDomainForUrl(String url) {
-            String regex = "^(https?://)?stackoverflow\\.com/questions/(\\d+)+/[^/]+/?$";
-            Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(url);
-
             return matcher.matches();
+        }
+
+        @Override
+        public String toString() {
+            return "StackOverflow";
         }
     },
 
