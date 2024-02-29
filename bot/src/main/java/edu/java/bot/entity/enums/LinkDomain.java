@@ -23,7 +23,7 @@ public enum LinkDomain {
     STACKOVERFLOW {
         private final String regex = "^(https?://)?stackoverflow\\.com/questions/(\\d+)+/[^/]+/?$";
         private final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        
+
         @Override
         public boolean isDomainForUrl(String url) {
             Matcher matcher = pattern.matcher(url);
