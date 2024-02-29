@@ -14,6 +14,7 @@ import reactor.test.StepVerifier;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GitHubWebClientImplTest {
 
@@ -50,8 +51,7 @@ public class GitHubWebClientImplTest {
         OffsetDateTime tCreatedAt = OffsetDateTime.parse("2024-02-15T14:57:46Z");
         OffsetDateTime tUpdatedAt = OffsetDateTime.parse("2024-02-15T15:08:26Z");
 
-        String mockResponse = String.format(
-            """
+        String mockResponse = String.format("""
                 {
                     "id": %d,
                     "name": "%s",
@@ -67,33 +67,40 @@ public class GitHubWebClientImplTest {
                     "created_at": "%s",
                     "updated_at": "%s"
                 }
-                """
-            , tId, tRepoName, tFullName, tOwnerName, tOwnerId, tOwnerUrl,
-            tOwnerHtmlUrl, tHtmlUrl, tDescription, tCreatedAt, tUpdatedAt
+                """,
+            tId,
+            tRepoName,
+            tFullName,
+            tOwnerName,
+            tOwnerId,
+            tOwnerUrl,
+            tOwnerHtmlUrl,
+            tHtmlUrl,
+            tDescription,
+            tCreatedAt,
+            tUpdatedAt
         );
 
-        wireMockServer.stubFor(get(WireMock.urlEqualTo("/repos/" + tOwnerName + "/" + tRepoName))
-            .willReturn(aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBody(mockResponse)));
+        wireMockServer.stubFor(get(WireMock.urlEqualTo(
+            "/repos/" + tOwnerName + "/" + tRepoName)).willReturn(aResponse().withHeader(
+            "Content-Type",
+            "application/json"
+        ).withBody(mockResponse)));
 
         Mono<GitHubRepoResponse> actualResponse = gitHubWebClientImpl.fetchRepo(tOwnerName, tRepoName);
 
-        StepVerifier.create(actualResponse)
-            .expectNextMatches(response ->
-                response.id().equals(tId) &&
-                    response.name().equals(tRepoName) &&
-                    response.fullName().equals(tFullName) &&
-                    response.owner().login().equals(tOwnerName) &&
-                    response.owner().id().equals(tOwnerId) &&
-                    response.owner().url().equals(tOwnerUrl) &&
-                    response.owner().htmlUrl().equals(tOwnerHtmlUrl) &&
-                    response.htmlUrl().equals(tHtmlUrl) &&
-                    response.description().equals(tDescription) &&
-                    response.createdAt().equals(tCreatedAt) &&
-                    response.updatedAt().equals(tUpdatedAt)
-            )
-            .verifyComplete();
-
+        StepVerifier.create(actualResponse).assertNext(response -> {
+            assertEquals(tId, response.id(), "id should match");
+            assertEquals(tRepoName, response.name(), "repoName should match");
+            assertEquals(tFullName, response.fullName(), "fullName should match");
+            assertEquals(tOwnerName, response.owner().login(), "ownerLogin should match");
+            assertEquals(tOwnerId, response.owner().id(), "ownerId should match");
+            assertEquals(tOwnerUrl, response.owner().url(), "ownerURL should match");
+            assertEquals(tOwnerHtmlUrl, response.owner().htmlUrl(), "ownerHtmlUrl should match");
+            assertEquals(tHtmlUrl, response.htmlUrl(), "htmlUrl should match");
+            assertEquals(tDescription, response.description(), "description should match");
+            assertEquals(tCreatedAt, response.createdAt(), "createdAt should match");
+            assertEquals(tUpdatedAt, response.updatedAt(), "updatedAt should match");
+        }).verifyComplete();
     }
 }
