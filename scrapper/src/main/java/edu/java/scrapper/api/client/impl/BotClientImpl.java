@@ -1,9 +1,9 @@
 package edu.java.scrapper.api.client.impl;
 
 import edu.java.scrapper.api.client.BotClient;
-import edu.java.scrapper.api.dto.request.LinkUpdateRequest;
-import edu.java.scrapper.api.dto.response.ApiErrorResponse;
-import edu.java.scrapper.api.exception.IncorrectRequestParamsException;
+import edu.java.scrapper.dto.request.LinkUpdateRequest;
+import edu.java.scrapper.dto.response.ApiErrorResponse;
+import edu.java.scrapper.exception.IncorrectRequestParamsException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

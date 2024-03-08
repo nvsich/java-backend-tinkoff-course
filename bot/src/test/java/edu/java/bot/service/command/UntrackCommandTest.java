@@ -1,153 +1,134 @@
 package edu.java.bot.service.command;
 
+import edu.java.bot.api.client.ScrapperClient;
+import edu.java.bot.dto.request.RemoveLinkRequest;
+import edu.java.bot.dto.response.LinkResponse;
 import edu.java.bot.entity.ChatState;
 import edu.java.bot.entity.MessageRequest;
 import edu.java.bot.entity.MessageResponse;
 import edu.java.bot.entity.enums.ChatStatus;
 import edu.java.bot.exception.ChatNotFoundException;
-import edu.java.bot.repo.ChatLinksRepo;
+import edu.java.bot.exception.LinkNotFoundException;
 import edu.java.bot.repo.ChatStateRepo;
-import edu.java.bot.repo.LinkRepo;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class UntrackCommandTest {
     private final Long CHAT_ID = 1L;
+    private final String MESSAGE = "https://example.com";
     @Captor
     ArgumentCaptor<ChatState> chatStateArgumentCaptor;
-    @Captor
-    ArgumentCaptor<Long> longArgumentCaptor;
-    @Mock
     private ChatStateRepo mockChatStateRepo;
-    @Mock
-    private ChatLinksRepo mockChatLinksRepo;
-    @Mock
-    private LinkRepo mockLinkRepo;
-    @InjectMocks
     private UntrackCommand untrackCommand;
-    @Mock
-    private MessageRequest mockMessageRequest;
+    private MessageRequest messageRequest;
+    private ScrapperClient mockScrapperClient;
 
     @BeforeEach
     void setUp() {
-        when(mockMessageRequest.getChatId()).thenReturn(CHAT_ID);
+        mockChatStateRepo = mock(ChatStateRepo.class);
+        mockScrapperClient = mock(ScrapperClient.class);
+        messageRequest = new MessageRequest(CHAT_ID, MESSAGE);
+        untrackCommand = new UntrackCommand(mockChatStateRepo, mockScrapperClient);
     }
 
     @Test
     @DisplayName("Throws ChatNotFoundException when user is not registered")
     void handle_ChatNotFoundException() {
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
+        when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(ChatNotFoundException.class, () -> untrackCommand.handle(mockMessageRequest));
+        assertThrows(ChatNotFoundException.class, () -> untrackCommand.handle(messageRequest));
     }
 
     @Test
     @DisplayName("Should change chatState and return message when initial ChatStatus is WAITING_FOR_COMMAND")
     void handle_UntrackCommandFirstInteraction() throws ChatNotFoundException {
-        ChatState tChatState = new ChatState(CHAT_ID, ChatStatus.WAITING_FOR_COMMAND);
+        ChatState tChatState = ChatState.builder()
+            .chatId(CHAT_ID)
+            .chatStatus(ChatStatus.WAITING_FOR_COMMAND)
+            .build();
 
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
+        when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.of(tChatState));
 
-        MessageResponse actualResponse = untrackCommand.handle(mockMessageRequest);
+        MessageResponse actualResponse = untrackCommand.handle(messageRequest);
 
         verify(mockChatStateRepo, times(1))
-            .save(any(Long.class), chatStateArgumentCaptor.capture());
+            .save(chatStateArgumentCaptor.capture());
 
         ChatState actualChatState = chatStateArgumentCaptor.getValue();
 
-        assertEquals(mockMessageRequest.getChatId(), actualChatState.getChatId());
+        assertEquals(messageRequest.getChatId(), actualChatState.getChatId());
         assertEquals(ChatStatus.WAITING_FOR_LINK_TO_UNTRACK, actualChatState.getChatStatus());
-        assertEquals(mockMessageRequest.getChatId(), actualResponse.getChatId());
+        assertEquals(messageRequest.getChatId(), actualResponse.getChatId());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when given id is not correct")
-    void handle_GivenIdIsNotCorrect_ThrowsIllegalArgumentException() {
-        ChatState tChatState = new ChatState(CHAT_ID, ChatStatus.WAITING_FOR_LINK_TO_UNTRACK);
-        String tIncorrectId = "URL";
+    @DisplayName("Should return link with message when successfully removed")
+    void handle_SuccessfullyAddedLink() throws URISyntaxException {
+        ChatState tChatState = ChatState.builder()
+            .chatId(CHAT_ID)
+            .chatStatus(ChatStatus.WAITING_FOR_LINK_TO_UNTRACK)
+            .build();
 
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
+        when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.of(tChatState));
 
-        when(mockMessageRequest.getText()).thenReturn(tIncorrectId);
+        var tRemoveLinkRequest = new RemoveLinkRequest(MESSAGE);
+        var tLinkResponse = new LinkResponse();
+        URI tUri = new URI(MESSAGE);
+        tLinkResponse.setUrl(tUri);
+        when(mockScrapperClient.deleteLinkForChat(CHAT_ID, tRemoveLinkRequest)).thenReturn(Mono.just(tLinkResponse));
 
-        assertThrows(IllegalArgumentException.class, () -> untrackCommand.handle(mockMessageRequest));
+        MessageResponse actualResponse = untrackCommand.handle(messageRequest);
 
         verify(mockChatStateRepo, times(1))
-            .save(any(Long.class), chatStateArgumentCaptor.capture());
+            .save(chatStateArgumentCaptor.capture());
 
-        assertEquals(ChatStatus.WAITING_FOR_COMMAND, chatStateArgumentCaptor.getValue().getChatStatus());
-        assertEquals(mockMessageRequest.getChatId(), chatStateArgumentCaptor.getValue().getChatId());
+        ChatState actualChatState = chatStateArgumentCaptor.getValue();
+
+        assertEquals(messageRequest.getChatId(), actualChatState.getChatId());
+        assertEquals(ChatStatus.WAITING_FOR_COMMAND, actualChatState.getChatStatus());
+        assertEquals(messageRequest.getChatId(), actualResponse.getChatId());
+        assertEquals("Link " + MESSAGE + " removed from your tracking list", actualResponse.getText());
     }
 
     @Test
-    @DisplayName("Should return special message when user is not tracking ling with given correct id")
-    void handle_CorrectIdNotFound() throws ChatNotFoundException {
-        ChatState tChatState = new ChatState(CHAT_ID, ChatStatus.WAITING_FOR_LINK_TO_UNTRACK);
-        String tLinkId = "123";
+    @DisplayName("Should return message when exception from ScrapperClient")
+    void handle_ExceptionFromScrapperClient() {
+        ChatState tChatState = ChatState.builder()
+            .chatId(CHAT_ID)
+            .chatStatus(ChatStatus.WAITING_FOR_LINK_TO_UNTRACK)
+            .build();
 
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
+        when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.of(tChatState));
 
-        when(mockMessageRequest.getText()).thenReturn(tLinkId);
+        String tExceptionMessage = "exception";
 
-        when(mockChatLinksRepo.findById(mockMessageRequest.getChatId())).thenReturn(Set.of());
+        when(mockScrapperClient.deleteLinkForChat(any(), any()))
+            .thenThrow(new LinkNotFoundException(tExceptionMessage));
 
-        MessageResponse actualResponse = untrackCommand.handle(mockMessageRequest);
+        MessageResponse actualResponse = untrackCommand.handle(messageRequest);
 
-        verify(mockChatStateRepo, times(1))
-            .save(any(Long.class), chatStateArgumentCaptor.capture());
-
-        assertEquals(ChatStatus.WAITING_FOR_COMMAND, chatStateArgumentCaptor.getValue().getChatStatus());
-        assertEquals(mockMessageRequest.getChatId(), chatStateArgumentCaptor.getValue().getChatId());
-
-        assertEquals(mockMessageRequest.getChatId(), actualResponse.getChatId());
-    }
-
-    @Test
-    @DisplayName("Should delete link with given correct id")
-    void handle_CorrectIdFound_DeleteFromRepo() throws ChatNotFoundException {
-        ChatState tChatState = new ChatState(CHAT_ID, ChatStatus.WAITING_FOR_LINK_TO_UNTRACK);
-        String tLinkId = "123";
-        Long tLinkIdParsed = Long.parseLong(tLinkId);
-
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
-            .thenReturn(Optional.of(tChatState));
-
-        when(mockMessageRequest.getText()).thenReturn(tLinkId);
-
-        when(mockChatLinksRepo.findById(mockMessageRequest.getChatId())).thenReturn(Set.of(tLinkIdParsed));
-
-        MessageResponse actualResponse = untrackCommand.handle(mockMessageRequest);
-
-        verify(mockChatStateRepo, times(1))
-            .save(any(Long.class), chatStateArgumentCaptor.capture());
-
-        verify(mockChatLinksRepo, times(1))
-            .deleteLinkId(any(Long.class), longArgumentCaptor.capture());
-
-        assertEquals(ChatStatus.WAITING_FOR_COMMAND, chatStateArgumentCaptor.getValue().getChatStatus());
-        assertEquals(mockMessageRequest.getChatId(), chatStateArgumentCaptor.getValue().getChatId());
-
-        assertEquals(tLinkIdParsed, longArgumentCaptor.getValue());
-
-        assertEquals(mockMessageRequest.getChatId(), actualResponse.getChatId());
+        assertEquals(messageRequest.getChatId(), actualResponse.getChatId());
+        assertEquals(tExceptionMessage, actualResponse.getText());
     }
 }

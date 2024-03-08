@@ -1,6 +1,6 @@
 package edu.java.scrapper.api.client;
 
-import edu.java.scrapper.api.dto.request.LinkUpdateRequest;
+import edu.java.scrapper.dto.request.LinkUpdateRequest;
 import reactor.core.publisher.Mono;
 
 public interface BotClient {

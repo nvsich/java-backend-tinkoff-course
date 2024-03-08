@@ -1,8 +1,8 @@
 package edu.java.bot.service.processor.impl;
 
-import edu.java.bot.api.dto.request.LinkUpdateRequest;
-import edu.java.bot.api.exception.InvalidLinkUpdateException;
+import edu.java.bot.dto.request.LinkUpdateRequest;
 import edu.java.bot.entity.MessageResponse;
+import edu.java.bot.exception.InvalidLinkUpdateException;
 import edu.java.bot.service.processor.LinkUpdateProcessor;
 import edu.java.bot.telegrambot.Bot;
 import lombok.AllArgsConstructor;

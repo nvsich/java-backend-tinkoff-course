@@ -1,14 +1,14 @@
 package edu.java.bot.api.client.impl;
 
 import edu.java.bot.api.client.ScrapperClient;
-import edu.java.bot.api.dto.request.AddLinkRequest;
-import edu.java.bot.api.dto.request.RemoveLinkRequest;
-import edu.java.bot.api.dto.response.ApiErrorResponse;
-import edu.java.bot.api.dto.response.LinkResponse;
-import edu.java.bot.api.dto.response.ListLinkResponse;
-import edu.java.bot.api.exception.ChatNotFoundException;
-import edu.java.bot.api.exception.IncorrectRequestParamsException;
-import edu.java.bot.api.exception.LinkNotFoundException;
+import edu.java.bot.dto.request.AddLinkRequest;
+import edu.java.bot.dto.request.RemoveLinkRequest;
+import edu.java.bot.dto.response.ApiErrorResponse;
+import edu.java.bot.dto.response.LinkResponse;
+import edu.java.bot.dto.response.ListLinkResponse;
+import edu.java.bot.exception.ChatNotFoundException;
+import edu.java.bot.exception.IncorrectRequestParamsException;
+import edu.java.bot.exception.LinkNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,13 +20,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ScrapperClientImpl implements ScrapperClient {
 
-    private final WebClient webClient;
-
     private static final String TG_CHAT_URI = "/tg-chat/{id}";
-
     private static final String LINKS_URI = "/links";
-
     private static final String TG_CHAT_ID_HEADER = "Tg-Chat-Id";
+    private final WebClient webClient;
 
     public ScrapperClientImpl(WebClient.Builder webClient, String baseUrl) {
         this.webClient = webClient.baseUrl(baseUrl).build();
@@ -92,6 +89,11 @@ public class ScrapperClientImpl implements ScrapperClient {
                 status -> status == HttpStatus.BAD_REQUEST,
                 clientResponse -> clientResponse.bodyToMono(ApiErrorResponse.class)
                     .map(error -> new IncorrectRequestParamsException(error.getDescription()))
+            )
+            .onStatus(
+                status -> status == HttpStatus.NOT_FOUND,
+                clientResponse -> clientResponse.bodyToMono(ApiErrorResponse.class)
+                    .map(error -> new ChatNotFoundException(error.getDescription()))
             )
             .bodyToMono(LinkResponse.class);
     }

@@ -1,9 +1,9 @@
 package edu.java.bot.api.client;
 
-import edu.java.bot.api.dto.request.AddLinkRequest;
-import edu.java.bot.api.dto.request.RemoveLinkRequest;
-import edu.java.bot.api.dto.response.LinkResponse;
-import edu.java.bot.api.dto.response.ListLinkResponse;
+import edu.java.bot.dto.request.AddLinkRequest;
+import edu.java.bot.dto.request.RemoveLinkRequest;
+import edu.java.bot.dto.response.LinkResponse;
+import edu.java.bot.dto.response.ListLinkResponse;
 import reactor.core.publisher.Mono;
 
 public interface ScrapperClient {
