@@ -1,4 +1,4 @@
-package edu.java.scrapper;
+package edu.java.bot;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import liquibase.Contexts;
+import liquibase.LabelExpression;
 import liquibase.Liquibase;
 import liquibase.command.CommandScope;
 import liquibase.command.core.UpdateCommandStep;
@@ -29,7 +31,7 @@ public abstract class IntegrationTest {
 
     static {
         POSTGRES = new PostgreSQLContainer<>("postgres:16")
-            .withDatabaseName("scrapper")
+            .withDatabaseName("bot")
             .withUsername("postgres")
             .withPassword("postgres");
         POSTGRES.start();
