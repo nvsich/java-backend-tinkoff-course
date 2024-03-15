@@ -1,28 +1,25 @@
 package edu.java.bot.service.command;
 
+import edu.java.bot.api.client.ScrapperClient;
+import edu.java.bot.dto.request.AddLinkRequest;
+import edu.java.bot.dto.response.LinkResponse;
 import edu.java.bot.entity.ChatState;
-import edu.java.bot.entity.Link;
 import edu.java.bot.entity.MessageRequest;
 import edu.java.bot.entity.MessageResponse;
 import edu.java.bot.entity.enums.ChatStatus;
-import edu.java.bot.entity.enums.LinkDomain;
-import edu.java.bot.entity.factory.LinkFactory;
 import edu.java.bot.exception.ChatNotFoundException;
-import edu.java.bot.exception.UnsupportedDomainException;
-import edu.java.bot.repo.ChatLinksRepo;
 import edu.java.bot.repo.ChatStateRepo;
-import edu.java.bot.repo.LinkRepo;
-import java.net.ConnectException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,143 +28,110 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class TrackCommandTest {
-
     private final Long CHAT_ID = 1L;
-    private final String URL = "URL";
+    private final String URL = "https://example.com";
     @Captor
     ArgumentCaptor<ChatState> chatStateArgumentCaptor;
     @Captor
-    ArgumentCaptor<Link> linkArgumentCaptor;
-    @Captor
     ArgumentCaptor<Long> longArgumentCaptor;
-    @Mock
     private ChatStateRepo mockChatStateRepo;
-    @Mock
-    private LinkRepo mockLinkRepo;
-    @Mock
-    private ChatLinksRepo mockChatLinksRepo;
-    @Mock
-    private LinkFactory mockLinkFactory;
-    @InjectMocks
     private TrackCommand trackCommand;
-    @Mock
-    private MessageRequest mockMessageRequest;
+    private MessageRequest messageRequest;
+    private ScrapperClient mockScrapperClient;
 
     @BeforeEach
     void setUp() {
-        when(mockMessageRequest.getChatId()).thenReturn(CHAT_ID);
-        when(mockMessageRequest.getText()).thenReturn(URL);
+        mockScrapperClient = mock(ScrapperClient.class);
+        mockChatStateRepo = mock(ChatStateRepo.class);
+
+        messageRequest = new MessageRequest(CHAT_ID, URL);
+
+        trackCommand = new TrackCommand(mockChatStateRepo, mockScrapperClient);
     }
 
     @Test
     @DisplayName("Throws ChatNotFoundException when user is not registered")
     void handle_ChatNotFoundException() {
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
+        when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.empty());
 
-        assertThrows(ChatNotFoundException.class, () -> trackCommand.handle(mockMessageRequest));
+        assertThrows(ChatNotFoundException.class, () -> trackCommand.handle(messageRequest));
     }
 
     @Test
     @DisplayName("Should change chatState and return message when initial ChatStatus is WAITING_FOR_COMMAND")
-    void handle_TrackCommandFirstInteraction()
-        throws ChatNotFoundException, UnsupportedDomainException, URISyntaxException, ConnectException {
-        ChatState tChatState = new ChatState(CHAT_ID, ChatStatus.WAITING_FOR_COMMAND);
+    void handle_TrackCommandFirstInteraction() throws ChatNotFoundException {
+        ChatState tChatState = ChatState.builder()
+            .chatId(CHAT_ID)
+            .chatStatus(ChatStatus.WAITING_FOR_COMMAND)
+            .build();
 
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
+        when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.of(tChatState));
 
-        MessageResponse actualResponse = trackCommand.handle(mockMessageRequest);
+        MessageResponse actualResponse = trackCommand.handle(messageRequest);
 
         verify(mockChatStateRepo, times(1))
-            .save(any(Long.class), chatStateArgumentCaptor.capture());
+            .save(chatStateArgumentCaptor.capture());
 
         ChatState actualChatState = chatStateArgumentCaptor.getValue();
 
-        assertEquals(mockMessageRequest.getChatId(), actualChatState.getChatId());
+        assertEquals(messageRequest.getChatId(), actualChatState.getChatId());
         assertEquals(ChatStatus.WAITING_FOR_LINK_TO_TRACK, actualChatState.getChatStatus());
-        assertEquals(mockMessageRequest.getChatId(), actualResponse.getChatId());
+        assertEquals(messageRequest.getChatId(), actualResponse.getChatId());
     }
 
     @Test
-    @DisplayName("Should throw UnsupportedDomainException when created link is null and saving ChatState")
-    void test_CreatedLinkIsNull() throws URISyntaxException, ConnectException {
-        ChatState tChatState = new ChatState(CHAT_ID, ChatStatus.WAITING_FOR_LINK_TO_TRACK);
+    @DisplayName("Should return link with message when successfully added")
+    void handle_SuccessfullyAddedLink() throws URISyntaxException {
+        ChatState tChatState = ChatState.builder()
+            .chatId(CHAT_ID)
+            .chatStatus(ChatStatus.WAITING_FOR_LINK_TO_TRACK)
+            .build();
 
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
+        when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.of(tChatState));
 
-        when(mockLinkFactory.createLink(mockMessageRequest.getText())).thenReturn(null);
+        var tAddLinkRequest = new AddLinkRequest(URL);
+        var tLinkResponse = new LinkResponse();
+        URI tUri = new URI(URL);
+        tLinkResponse.setUrl(tUri);
+        when(mockScrapperClient.addLinkToChat(CHAT_ID, tAddLinkRequest)).thenReturn(tLinkResponse);
 
-        assertThrows(UnsupportedDomainException.class, () -> trackCommand.handle(mockMessageRequest));
+        MessageResponse actualResponse = trackCommand.handle(messageRequest);
 
         verify(mockChatStateRepo, times(1))
-            .save(any(Long.class), chatStateArgumentCaptor.capture());
+            .save(chatStateArgumentCaptor.capture());
 
         ChatState actualChatState = chatStateArgumentCaptor.getValue();
 
-        assertEquals(mockMessageRequest.getChatId(), actualChatState.getChatId());
+        assertEquals(messageRequest.getChatId(), actualChatState.getChatId());
         assertEquals(ChatStatus.WAITING_FOR_COMMAND, actualChatState.getChatStatus());
+        assertEquals(messageRequest.getChatId(), actualResponse.getChatId());
+        assertEquals("Link " + tUri + " added to your tracking list", actualResponse.getText());
     }
 
     @Test
-    @DisplayName("Should throw UnsupportedDomainException when created link is unsupported and saving ChatState")
-    void test_CreatedLinkIsNotSupported() throws URISyntaxException, ConnectException {
-        ChatState tChatState = new ChatState(CHAT_ID, ChatStatus.WAITING_FOR_LINK_TO_TRACK);
-        Link mockLink = mock(Link.class);
+    @DisplayName("Should return message when exception from ScrapperClient")
+    void handle_ExceptionFromScrapperClient() {
+        ChatState tChatState = ChatState.builder()
+            .chatId(CHAT_ID)
+            .chatStatus(ChatStatus.WAITING_FOR_LINK_TO_TRACK)
+            .build();
 
-        when(mockLink.getLinkDomain()).thenReturn(LinkDomain.NOT_SUPPORTED);
-
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
+        when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.of(tChatState));
 
-        when(mockLinkFactory.createLink(mockMessageRequest.getText())).thenReturn(mockLink);
+        String tExceptionMessage = "exception";
 
-        assertThrows(UnsupportedDomainException.class, () -> trackCommand.handle(mockMessageRequest));
+        when(mockScrapperClient.addLinkToChat(any(), any()))
+            .thenThrow(new ChatNotFoundException(tExceptionMessage));
 
-        verify(mockChatStateRepo, times(1))
-            .save(any(Long.class), chatStateArgumentCaptor.capture());
+        MessageResponse actualResponse = trackCommand.handle(messageRequest);
 
-        ChatState actualChatState = chatStateArgumentCaptor.getValue();
-
-        assertEquals(mockMessageRequest.getChatId(), actualChatState.getChatId());
-        assertEquals(ChatStatus.WAITING_FOR_COMMAND, actualChatState.getChatStatus());
-    }
-
-    @Test
-    @DisplayName("Should save Link and ChatState, return message when link is correct")
-    void test_LinkIsCorrect()
-        throws URISyntaxException, ConnectException, ChatNotFoundException, UnsupportedDomainException {
-        ChatState tChatState = new ChatState(CHAT_ID, ChatStatus.WAITING_FOR_LINK_TO_TRACK);
-        Link mockLink = mock(Link.class);
-        Long tLinkId = 123L;
-
-        when(mockLink.getId()).thenReturn(tLinkId);
-        when(mockLink.getLinkDomain()).thenReturn(LinkDomain.GITHUB);
-
-        when(mockChatStateRepo.findById(mockMessageRequest.getChatId()))
-            .thenReturn(Optional.of(tChatState));
-
-        when(mockLinkFactory.createLink(mockMessageRequest.getText())).thenReturn(mockLink);
-
-        MessageResponse actualResponse = trackCommand.handle(mockMessageRequest);
-
-        verify(mockChatStateRepo, times(1))
-            .save(any(Long.class), chatStateArgumentCaptor.capture());
-
-        verify(mockLinkRepo, times(1))
-            .save(linkArgumentCaptor.capture());
-
-        verify(mockChatLinksRepo, times(1))
-            .save(any(), longArgumentCaptor.capture());
-
-        assertEquals(mockMessageRequest.getChatId(), chatStateArgumentCaptor.getValue().getChatId());
-        assertEquals(ChatStatus.WAITING_FOR_COMMAND, chatStateArgumentCaptor.getValue().getChatStatus());
-
-        assertEquals(mockLink.getId(), linkArgumentCaptor.getValue().getId());
-
-        assertEquals(mockMessageRequest.getChatId(), actualResponse.getChatId());
+        assertEquals(messageRequest.getChatId(), actualResponse.getChatId());
+        assertEquals(tExceptionMessage, actualResponse.getText());
     }
 }

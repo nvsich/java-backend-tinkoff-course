@@ -1,28 +1,23 @@
 package edu.java.bot.service.command;
 
+import edu.java.bot.api.client.ScrapperClient;
+import edu.java.bot.dto.response.ListLinkResponse;
 import edu.java.bot.entity.ChatState;
-import edu.java.bot.entity.Link;
 import edu.java.bot.entity.MessageRequest;
 import edu.java.bot.entity.MessageResponse;
 import edu.java.bot.entity.enums.ChatStatus;
 import edu.java.bot.exception.ChatNotFoundException;
-import edu.java.bot.repo.ChatLinksRepo;
+import edu.java.bot.exception.IncorrectRequestParamsException;
 import edu.java.bot.repo.ChatStateRepo;
-import edu.java.bot.repo.LinkRepo;
-import java.util.List;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class ListCommand implements Command {
-
-    private final ChatLinksRepo chatLinksRepo;
-
+    private static final String NOT_TRACKING_TEXT = "You are not tracking any links yet";
     private final ChatStateRepo chatStateRepo;
-
-    private final LinkRepo linkRepo;
+    private ScrapperClient scrapperClient;
 
     @Override
     public String command() {
@@ -35,28 +30,34 @@ public class ListCommand implements Command {
     }
 
     @Override
-    public MessageResponse handle(MessageRequest request) throws ChatNotFoundException {
+    public MessageResponse handle(MessageRequest request) {
         Long chatId = request.getChatId();
 
-        ChatState chatState = chatStateRepo.findById(chatId).orElseThrow(ChatNotFoundException::new);
+        ChatState chatState = chatStateRepo.findByChatId(chatId).orElseThrow(ChatNotFoundException::new);
 
         chatState.setChatStatus(ChatStatus.WAITING_FOR_COMMAND);
 
-        Set<Long> chatLinksIds = chatLinksRepo.findById(chatId);
-        List<Link> links = linkRepo.findAllById(chatLinksIds);
+        ListLinkResponse listLinkResponse;
+        try {
+            listLinkResponse = scrapperClient.getAllLinksForChat(chatId);
+        } catch (IncorrectRequestParamsException e) {
+            return new MessageResponse(chatId, e.getMessage());
+        }
 
-        if (links.isEmpty()) {
-            return new MessageResponse(chatId, "You are not tracking any links yet");
+        return new MessageResponse(chatId, processLinks(listLinkResponse));
+    }
+
+    private String processLinks(ListLinkResponse links) {
+        if (links == null || links.getLinks().isEmpty()) {
+            return NOT_TRACKING_TEXT;
         }
 
         StringBuilder stringBuilder = new StringBuilder("Current tracking links:\n");
-        for (Link link : links) {
-            stringBuilder
-                .append("id: ").append(link.getId()).append(". ")
-                .append('[').append(link.getLinkDomain()).append("] ")
-                .append(link.getUrl()).append('\n');
+        for (var link : links.getLinks()) {
+            var url = link.getUrl().toString();
+            stringBuilder.append(url).append('\n');
         }
 
-        return new MessageResponse(chatId, stringBuilder.toString());
+        return stringBuilder.toString();
     }
 }

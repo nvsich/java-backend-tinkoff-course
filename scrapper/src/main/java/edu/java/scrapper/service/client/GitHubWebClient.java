@@ -1,8 +1,7 @@
 package edu.java.scrapper.service.client;
 
-import edu.java.scrapper.dto.GitHubRepoResponse;
-import reactor.core.publisher.Mono;
+import edu.java.scrapper.dto.response.GitHubRepoResponse;
 
 public interface GitHubWebClient {
-    Mono<GitHubRepoResponse> fetchRepo(String ownerName, String repoName);
+    GitHubRepoResponse fetchRepo(String ownerName, String repoName);
 }

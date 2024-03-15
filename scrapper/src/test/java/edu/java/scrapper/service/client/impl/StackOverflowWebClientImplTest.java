@@ -2,7 +2,7 @@ package edu.java.scrapper.service.client.impl;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import edu.java.scrapper.dto.StackOverflowQuestionResponse;
+import edu.java.scrapper.dto.response.StackOverflowQuestionResponse;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -89,10 +89,9 @@ class StackOverflowWebClientImplTest {
             "application/json"
         ).withBody(mockResponse)));
 
-        Mono<StackOverflowQuestionResponse> actualResponse =
-            stackOverflowWebClient.fetchQuestion(String.valueOf(tQuestionId));
+        var actualResponse = stackOverflowWebClient.fetchQuestion(String.valueOf(tQuestionId));
 
-        StepVerifier.create(actualResponse).assertNext(response -> {
+        StepVerifier.create(Mono.just(actualResponse)).assertNext(response -> {
             assertEquals(1, response.itemList().size(), "itemList should contain one item");
             var item = response.itemList().getFirst();
             assertEquals(tIsAnswered, item.isAnswered(), "isAnswered status should match");

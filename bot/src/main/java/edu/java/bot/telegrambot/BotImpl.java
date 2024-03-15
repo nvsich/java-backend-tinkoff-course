@@ -60,6 +60,12 @@ public class BotImpl implements Bot {
         this.telegramBot.removeGetUpdatesListener();
     }
 
+    @Override
+    public void sendMessage(MessageResponse messageResponse) {
+        SendMessage sendMessage = new SendMessage(messageResponse.getChatId(), messageResponse.getText());
+        this.telegramBot.execute(sendMessage);
+    }
+
     private <T extends BaseRequest<T, R>, R extends BaseResponse> void execute(BaseRequest<T, R> request) {
         this.telegramBot.execute(request);
     }

@@ -19,3 +19,12 @@ server:
 
 logging:
   config: classpath:log4j2-plain.xml
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  default-produces-media-type: application/json
+
+client:
+  bot:
+    baseUrl: "https://localhost:8090"

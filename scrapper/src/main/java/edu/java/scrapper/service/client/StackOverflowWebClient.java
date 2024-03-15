@@ -1,8 +1,7 @@
 package edu.java.scrapper.service.client;
 
-import edu.java.scrapper.dto.StackOverflowQuestionResponse;
-import reactor.core.publisher.Mono;
+import edu.java.scrapper.dto.response.StackOverflowQuestionResponse;
 
 public interface StackOverflowWebClient {
-    Mono<StackOverflowQuestionResponse> fetchQuestion(String questionId);
+    StackOverflowQuestionResponse fetchQuestion(String questionId);
 }

@@ -2,11 +2,11 @@ package edu.java.bot.repo;
 
 import edu.java.bot.entity.ChatState;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ChatStateRepo {
+@Repository
+public interface ChatStateRepo extends JpaRepository<ChatState, Long> {
 
-    Optional<ChatState> findById(Long id);
-
-    void save(Long id, ChatState chatState);
-
+    Optional<ChatState> findByChatId(Long chatId);
 }

@@ -2,7 +2,7 @@ package edu.java.scrapper.service.client.impl;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import edu.java.scrapper.dto.GitHubRepoResponse;
+import edu.java.scrapper.dto.response.GitHubRepoResponse;
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,9 +87,9 @@ public class GitHubWebClientImplTest {
             "application/json"
         ).withBody(mockResponse)));
 
-        Mono<GitHubRepoResponse> actualResponse = gitHubWebClientImpl.fetchRepo(tOwnerName, tRepoName);
+        var actualResponse = gitHubWebClientImpl.fetchRepo(tOwnerName, tRepoName);
 
-        StepVerifier.create(actualResponse).assertNext(response -> {
+        StepVerifier.create(Mono.just(actualResponse)).assertNext(response -> {
             assertEquals(tId, response.id(), "id should match");
             assertEquals(tRepoName, response.name(), "repoName should match");
             assertEquals(tFullName, response.fullName(), "fullName should match");
