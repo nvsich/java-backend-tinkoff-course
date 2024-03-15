@@ -18,7 +18,7 @@ import lombok.Data;
 @Table(name = "links")
 public class Link {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "link_id")
     private Long id;
 

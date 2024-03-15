@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class ChatState {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "chat_state_id")
     private Long id;
 
