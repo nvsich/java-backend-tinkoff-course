@@ -3,8 +3,9 @@ package edu.java.scrapper.entity.factory.impl;
 import edu.java.scrapper.entity.Link;
 import edu.java.scrapper.entity.enums.LinkDomain;
 import edu.java.scrapper.entity.factory.LinkFactory;
+import edu.java.scrapper.exception.LinkIsNotReachableException;
+import edu.java.scrapper.exception.LinkSyntaxException;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,20 +18,29 @@ public class LinkFactoryImpl implements LinkFactory {
     private final static String HTTP = "http://";
     private final static String HTTPS = "https://";
 
+    private final static String URL_NOT_CORRECT = "Given url is not correct";
+
+    private final static String NOT_REACHABLE = "Website is not reachable";
+
     @Override
     @Transactional
-    public Link createLink(String url) throws URISyntaxException, ConnectException {
+    public Link createLink(String url) {
         String fullUrl = ((!url.startsWith(HTTP) && !url.startsWith(HTTPS)) ? HTTPS : "") + url;
 
         if (!isValidLink(fullUrl)) {
-            throw new URISyntaxException(url, "Given url is not correct");
+            throw new LinkSyntaxException(URL_NOT_CORRECT);
         }
 
         if (!isReachableUrl(fullUrl)) {
-            throw new ConnectException("Website is not reachable");
+            throw new LinkIsNotReachableException(NOT_REACHABLE);
         }
 
-        URI uri = new URI(fullUrl);
+        URI uri;
+        try {
+            uri = new URI(fullUrl);
+        } catch (URISyntaxException e) {
+            throw new LinkSyntaxException(URL_NOT_CORRECT);
+        }
 
         for (LinkDomain linkDomain : LinkDomain.values()) {
             if (linkDomain.isDomainForUrl(fullUrl)) {
