@@ -1,7 +1,7 @@
 package edu.java.scrapper.controller;
 
 import edu.java.scrapper.dto.request.AddLinkRequest;
-import edu.java.scrapper.dto.request.RemoveLinkRequest;
+import edu.java.scrapper.dto.request.DeleteLinkRequest;
 import edu.java.scrapper.dto.response.ApiErrorResponse;
 import edu.java.scrapper.dto.response.LinkResponse;
 import edu.java.scrapper.dto.response.ListLinkResponse;
@@ -98,11 +98,11 @@ public class LinksController {
     })
     public ResponseEntity<LinkResponse> deleteLinkForChat(
         @RequestHeader(value = "Tg-Chat-Id") Long tgChatId,
-        @RequestBody RemoveLinkRequest removeLinkRequest
+        @RequestBody DeleteLinkRequest deleteLinkRequest
     ) {
-        log.info("ScrapperApiController#deleteLinkForChat: " + removeLinkRequest);
+        log.info("ScrapperApiController#deleteLinkForChat: " + deleteLinkRequest);
 
-        Link link = linksProcessor.deleteLinkForChat(tgChatId, removeLinkRequest.getUrl());
+        Link link = linksProcessor.deleteLinkForChat(tgChatId, deleteLinkRequest.getUrl());
 
         return ResponseEntity.ok(
             LinkResponse

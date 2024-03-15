@@ -1,7 +1,7 @@
 package edu.java.bot.api.client;
 
 import edu.java.bot.dto.request.AddLinkRequest;
-import edu.java.bot.dto.request.RemoveLinkRequest;
+import edu.java.bot.dto.request.DeleteLinkRequest;
 import edu.java.bot.dto.response.ApiErrorResponse;
 import edu.java.bot.dto.response.LinkResponse;
 import edu.java.bot.dto.response.ListLinkResponse;
@@ -93,12 +93,12 @@ public class ScrapperClient {
             .bodyToMono(LinkResponse.class);
     }
 
-    public Mono<LinkResponse> deleteLinkForChat(Long tgChatId, RemoveLinkRequest removeLinkRequest) {
+    public Mono<LinkResponse> deleteLinkForChat(Long tgChatId, DeleteLinkRequest deleteLinkRequest) {
         return webClient.method(HttpMethod.DELETE)
             .uri(LINKS_URI)
             .header(TG_CHAT_ID_HEADER, tgChatId.toString())
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(Mono.just(removeLinkRequest), RemoveLinkRequest.class)
+            .body(Mono.just(deleteLinkRequest), DeleteLinkRequest.class)
             .retrieve()
             .onStatus(
                 status -> status == HttpStatus.BAD_REQUEST,
