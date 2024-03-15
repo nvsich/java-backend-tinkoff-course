@@ -95,7 +95,7 @@ class UntrackCommandTest {
         var tLinkResponse = new LinkResponse();
         URI tUri = new URI(MESSAGE);
         tLinkResponse.setUrl(tUri);
-        when(mockScrapperClient.deleteLinkForChat(CHAT_ID, tRemoveLinkRequest)).thenReturn(Mono.just(tLinkResponse));
+        when(mockScrapperClient.deleteLinkForChat(CHAT_ID, tRemoveLinkRequest)).thenReturn(tLinkResponse);
 
         MessageResponse actualResponse = untrackCommand.handle(messageRequest);
 

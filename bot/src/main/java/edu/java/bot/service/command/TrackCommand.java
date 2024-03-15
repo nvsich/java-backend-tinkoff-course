@@ -50,7 +50,7 @@ public class TrackCommand implements Command {
 
             try {
                 var addLinkRequest = new AddLinkRequest(request.getText());
-                var linkResponse = scrapperClient.addLinkToChat(chatId, addLinkRequest).block();
+                var linkResponse = scrapperClient.addLinkToChat(chatId, addLinkRequest);
 
                 return new MessageResponse(
                     chatId,

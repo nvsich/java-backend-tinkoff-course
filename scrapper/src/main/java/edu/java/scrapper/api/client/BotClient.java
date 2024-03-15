@@ -7,7 +7,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 public class BotClient {
 
@@ -17,7 +16,7 @@ public class BotClient {
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
     }
 
-    public Mono<Void> sendUpdate(LinkUpdateRequest linkUpdateRequest) {
+    public Void sendUpdate(LinkUpdateRequest linkUpdateRequest) {
         return webClient.post()
             .uri("/updates")
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -28,6 +27,7 @@ public class BotClient {
                 clientResponse -> clientResponse.bodyToMono(ApiErrorResponse.class)
                     .map(error -> new IncorrectRequestParamsException(error.getDescription()))
             )
-            .bodyToMono(Void.class);
+            .bodyToMono(Void.class)
+            .block();
     }
 }

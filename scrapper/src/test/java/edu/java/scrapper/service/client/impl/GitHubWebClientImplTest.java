@@ -87,9 +87,9 @@ public class GitHubWebClientImplTest {
             "application/json"
         ).withBody(mockResponse)));
 
-        Mono<GitHubRepoResponse> actualResponse = gitHubWebClientImpl.fetchRepo(tOwnerName, tRepoName);
+        var actualResponse = gitHubWebClientImpl.fetchRepo(tOwnerName, tRepoName);
 
-        StepVerifier.create(actualResponse).assertNext(response -> {
+        StepVerifier.create(Mono.just(actualResponse)).assertNext(response -> {
             assertEquals(tId, response.id(), "id should match");
             assertEquals(tRepoName, response.name(), "repoName should match");
             assertEquals(tFullName, response.fullName(), "fullName should match");

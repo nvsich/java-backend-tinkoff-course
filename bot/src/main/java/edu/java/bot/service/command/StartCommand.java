@@ -42,7 +42,7 @@ public class StartCommand implements Command {
             );
 
             try {
-                scrapperClient.registerChat(chatId).block();
+                scrapperClient.registerChat(chatId);
             } catch (IncorrectRequestParamsException e) {
                 return new MessageResponse(chatId, e.getMessage());
             }

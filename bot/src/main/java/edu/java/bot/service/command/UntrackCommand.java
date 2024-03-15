@@ -51,7 +51,7 @@ public class UntrackCommand implements Command {
 
             try {
                 var removeLinkRequest = new DeleteLinkRequest(request.getText());
-                var linkResponse = scrapperClient.deleteLinkForChat(chatId, removeLinkRequest).block();
+                var linkResponse = scrapperClient.deleteLinkForChat(chatId, removeLinkRequest);
 
                 return new MessageResponse(
                     chatId,

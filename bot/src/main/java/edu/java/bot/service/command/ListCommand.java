@@ -38,7 +38,7 @@ public class ListCommand implements Command {
         chatState.setChatStatus(ChatStatus.WAITING_FOR_COMMAND);
 
         try {
-            var listLinkResponseFromClient = scrapperClient.getAllLinksForChat(chatId).block();
+            var listLinkResponseFromClient = scrapperClient.getAllLinksForChat(chatId);
 
             if (listLinkResponseFromClient == null) {
                 return new MessageResponse(chatId, NOT_TRACKING_TEXT);

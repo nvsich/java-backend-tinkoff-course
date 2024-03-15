@@ -28,7 +28,7 @@ public class ScrapperClient {
         this.webClient = webClient.baseUrl(baseUrl).build();
     }
 
-    public Mono<Void> registerChat(Long id) {
+    public Void registerChat(Long id) {
         return webClient.post()
             .uri(TG_CHAT_URI, id)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -38,10 +38,11 @@ public class ScrapperClient {
                 clientResponse -> clientResponse.bodyToMono(ApiErrorResponse.class)
                     .map(error -> new IncorrectRequestParamsException(error.getDescription()))
             )
-            .bodyToMono(Void.class);
+            .bodyToMono(Void.class)
+            .block();
     }
 
-    public Mono<Void> deleteChat(Long id) {
+    public Void deleteChat(Long id) {
         return webClient.method(HttpMethod.DELETE)
             .uri(TG_CHAT_URI, id)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -56,10 +57,11 @@ public class ScrapperClient {
                 clientResponse -> clientResponse.bodyToMono(ApiErrorResponse.class)
                     .map(error -> new ChatNotFoundException(error.getDescription()))
             )
-            .bodyToMono(Void.class);
+            .bodyToMono(Void.class)
+            .block();
     }
 
-    public Mono<ListLinkResponse> getAllLinksForChat(Long tgChatId) {
+    public ListLinkResponse getAllLinksForChat(Long tgChatId) {
         return webClient.get()
             .uri(LINKS_URI)
             .header(TG_CHAT_ID_HEADER, tgChatId.toString())
@@ -70,10 +72,11 @@ public class ScrapperClient {
                 clientResponse -> clientResponse.bodyToMono(ApiErrorResponse.class)
                     .map(error -> new IncorrectRequestParamsException(error.getDescription()))
             )
-            .bodyToMono(ListLinkResponse.class);
+            .bodyToMono(ListLinkResponse.class)
+            .block();
     }
 
-    public Mono<LinkResponse> addLinkToChat(Long tgChatId, AddLinkRequest addLinkRequest) {
+    public LinkResponse addLinkToChat(Long tgChatId, AddLinkRequest addLinkRequest) {
         return webClient.post()
             .uri(LINKS_URI)
             .header(TG_CHAT_ID_HEADER, tgChatId.toString())
@@ -90,10 +93,11 @@ public class ScrapperClient {
                 clientResponse -> clientResponse.bodyToMono(ApiErrorResponse.class)
                     .map(error -> new ChatNotFoundException(error.getDescription()))
             )
-            .bodyToMono(LinkResponse.class);
+            .bodyToMono(LinkResponse.class)
+            .block();
     }
 
-    public Mono<LinkResponse> deleteLinkForChat(Long tgChatId, DeleteLinkRequest deleteLinkRequest) {
+    public LinkResponse deleteLinkForChat(Long tgChatId, DeleteLinkRequest deleteLinkRequest) {
         return webClient.method(HttpMethod.DELETE)
             .uri(LINKS_URI)
             .header(TG_CHAT_ID_HEADER, tgChatId.toString())
@@ -110,6 +114,7 @@ public class ScrapperClient {
                 clientResponse -> clientResponse.bodyToMono(ApiErrorResponse.class)
                     .map(error -> new LinkNotFoundException(error.getDescription()))
             )
-            .bodyToMono(LinkResponse.class);
+            .bodyToMono(LinkResponse.class)
+            .block();
     }
 }
