@@ -4,6 +4,7 @@ import edu.java.scrapper.dto.response.ApiErrorResponse;
 import edu.java.scrapper.exception.ChatIsRegisteredException;
 import edu.java.scrapper.exception.ChatNotFoundException;
 import edu.java.scrapper.exception.LinkDomainNotSupportedException;
+import edu.java.scrapper.exception.LinkExistsException;
 import edu.java.scrapper.exception.LinkIsNotReachableException;
 import edu.java.scrapper.exception.LinkNotFoundException;
 import edu.java.scrapper.exception.LinkSyntaxException;
@@ -21,7 +22,8 @@ public class ScrapperApiExceptionHandler {
         ChatIsRegisteredException.class,
         LinkIsNotReachableException.class,
         LinkSyntaxException.class,
-        LinkDomainNotSupportedException.class
+        LinkDomainNotSupportedException.class,
+        LinkExistsException.class
     })
     public ResponseEntity<ApiErrorResponse> handleBadRequest(Exception ex) {
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()

@@ -6,8 +6,10 @@ import edu.java.scrapper.entity.enums.LinkDomain;
 import edu.java.scrapper.entity.factory.LinkFactory;
 import edu.java.scrapper.exception.ChatNotFoundException;
 import edu.java.scrapper.exception.LinkDomainNotSupportedException;
+import edu.java.scrapper.exception.LinkExistsException;
 import edu.java.scrapper.exception.LinkNotFoundException;
 import edu.java.scrapper.exception.LinkSyntaxException;
+import edu.java.scrapper.repo.ChatLinkRepo;
 import edu.java.scrapper.repo.ChatRepo;
 import edu.java.scrapper.repo.LinkRepo;
 import edu.java.scrapper.service.processor.LinksProcessor;
@@ -26,6 +28,8 @@ public class LinksProcessorImpl implements LinksProcessor {
 
     private ChatRepo chatRepo;
 
+    private ChatLinkRepo chatLinkRepo;
+
     private LinkFactory linkFactory;
 
     private static final String CHAT_NOT_FOUND = "Chat not found";
@@ -40,8 +44,7 @@ public class LinksProcessorImpl implements LinksProcessor {
             throw new ChatNotFoundException(CHAT_NOT_FOUND);
         }
 
-        //return linkRepo.findAllById(chat.get().getLinkIds());
-        return null;
+        return chatLinkRepo.findAllLinksForChat(chatId);
     }
 
     @Override
@@ -58,9 +61,11 @@ public class LinksProcessorImpl implements LinksProcessor {
             throw new LinkDomainNotSupportedException("This domain is not supported");
         }
 
-        /*chat.get().getLinkIds().add(link.getId());
-        link.getChatIds().add(chatId);*/
+        if (linkRepo.findByUrl(link.getUrl()).isPresent()) {
+            throw new LinkExistsException("This link is already being tracked");
+        }
 
+        chatLinkRepo.save(chatId, link.getId());
         return link;
     }
 
@@ -86,7 +91,7 @@ public class LinksProcessorImpl implements LinksProcessor {
             throw new LinkNotFoundException("Link not found");
         }
 
-//        chat.get().getLinkIds().remove(link.get().getId());
+        chatLinkRepo.remove(chatId, link.get().getId());
 
         return link.get();
     }
