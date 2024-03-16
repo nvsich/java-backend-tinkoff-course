@@ -21,6 +21,10 @@ spring:
     driver-class-name: org.postgresql.Driver
   application:
     name: scrapper
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
   port: 8080

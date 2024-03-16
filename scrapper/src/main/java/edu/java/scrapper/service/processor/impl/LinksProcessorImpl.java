@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -37,6 +38,7 @@ public class LinksProcessorImpl implements LinksProcessor {
     private static final String HTTPS = "https://";
 
     @Override
+    @Transactional
     public List<Link> getAllLinksForChat(Long chatId) {
         Optional<Chat> chat = chatRepo.findByChatId(chatId);
 
@@ -48,6 +50,7 @@ public class LinksProcessorImpl implements LinksProcessor {
     }
 
     @Override
+    @Transactional
     public Link addLinkToChat(Long chatId, String url) {
         Optional<Chat> chat = chatRepo.findByChatId(chatId);
 
@@ -70,6 +73,7 @@ public class LinksProcessorImpl implements LinksProcessor {
     }
 
     @Override
+    @Transactional
     public Link deleteLinkForChat(Long chatId, String url) {
         Optional<Chat> chat = chatRepo.findByChatId(chatId);
 

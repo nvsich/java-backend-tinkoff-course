@@ -1,11 +1,10 @@
 package edu.java.bot.repo.jdbc;
 
 import edu.java.bot.entity.ChatState;
-import edu.java.bot.entity.enums.ChatStatus;
 import edu.java.bot.repo.ChatStateRepo;
+import edu.java.bot.repo.mapper.ChatStateRowMapper;
 import java.util.List;
 import java.util.Optional;
-import edu.java.bot.repo.mapper.ChatStateRowMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

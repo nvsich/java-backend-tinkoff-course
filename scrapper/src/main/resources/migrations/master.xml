@@ -8,4 +8,10 @@
        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <include file="sql/001_init_scheme.sql" relativeToChangelogFile="true"/>
+
+    <changeSet id="2" author="Viktor Nakonechnyy">
+        <addColumn tableName="links">
+            <column name="updated_at" type="timestamp with time zone"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

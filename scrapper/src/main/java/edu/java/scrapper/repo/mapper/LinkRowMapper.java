@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 
 public class LinkRowMapper implements RowMapper<Link> {
     @Override
@@ -13,7 +14,10 @@ public class LinkRowMapper implements RowMapper<Link> {
         var id = rs.getLong("link_id");
         var linkDomain = LinkDomain.valueOf(rs.getString("link_domain"));
         var uri = URI.create(rs.getString("url"));
+        var dateTime = rs.getTimestamp("updated_at")
+            .toLocalDateTime()
+            .atOffset(OffsetDateTime.now().getOffset());
 
-        return new Link(id, linkDomain, uri);
+        return new Link(id, linkDomain, uri, dateTime);
     }
 }

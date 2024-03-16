@@ -4,6 +4,9 @@ import edu.java.scrapper.IntegrationTest;
 import edu.java.scrapper.ScrapperApplication;
 import edu.java.scrapper.entity.factory.LinkFactory;
 import java.net.URI;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(classes = ScrapperApplication.class)
 @ActiveProfiles("test")
@@ -69,5 +73,52 @@ class JdbcLinkRepoTest extends IntegrationTest {
         var result = jdbcLinkRepo.deleteByUrl(uri);
 
         Assertions.assertTrue(jdbcLinkRepo.findByUrl(result.getUrl()).isEmpty());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    void changeUpdatedAt_ShouldChangeUpdatedAtTime() {
+        var link = linkFactory.createLink(EXAMPLE_URL);
+        var uri = URI.create(EXAMPLE_URL);
+
+        jdbcLinkRepo.save(link);
+
+        var newTime = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS).minusMinutes(10);
+        jdbcLinkRepo.changeUpdatedAt(uri, newTime);
+
+        Assertions.assertEquals(newTime, jdbcLinkRepo.findByUrl(uri).get().getUpdatedAt());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    void findOutdatedLinks_ShouldFindOutdatedLinks() {
+        var link = linkFactory.createLink(EXAMPLE_URL);
+        var uri = URI.create(EXAMPLE_URL);
+
+        jdbcLinkRepo.save(link);
+
+        jdbcLinkRepo.changeUpdatedAt(uri, OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS).minusMinutes(10));
+
+        var result = jdbcLinkRepo.findOutdatedLinks(Duration.ofMinutes(10));
+
+        Assertions.assertEquals(uri.toString(), result.getFirst().getUrl().toString());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    void findOutdatedLinks_ShouldNotFindNotOutdatedLinks() {
+        var link = linkFactory.createLink(EXAMPLE_URL);
+        var uri = URI.create(EXAMPLE_URL);
+
+        jdbcLinkRepo.save(link);
+
+        jdbcLinkRepo.changeUpdatedAt(uri, OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS).plusMinutes(10));
+
+        var result = jdbcLinkRepo.findOutdatedLinks(Duration.ofMinutes(10));
+
+        Assertions.assertTrue(result.isEmpty());
     }
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.net.URI;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,5 +31,8 @@ public class Link {
 
     @Column(name = "url")
     private URI url;
+
+    @Column(name = "updated_at")
+    private OffsetDateTime updatedAt;
 
 }
