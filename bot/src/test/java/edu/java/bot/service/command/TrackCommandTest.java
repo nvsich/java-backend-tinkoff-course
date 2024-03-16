@@ -98,7 +98,7 @@ class TrackCommandTest {
         var tLinkResponse = new LinkResponse();
         URI tUri = new URI(URL);
         tLinkResponse.setUrl(tUri);
-        when(mockScrapperClient.addLinkToChat(CHAT_ID, tAddLinkRequest)).thenReturn(Mono.just(tLinkResponse));
+        when(mockScrapperClient.addLinkToChat(CHAT_ID, tAddLinkRequest)).thenReturn(tLinkResponse);
 
         MessageResponse actualResponse = trackCommand.handle(messageRequest);
 

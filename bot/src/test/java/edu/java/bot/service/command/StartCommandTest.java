@@ -51,8 +51,6 @@ class StartCommandTest {
         when(mockChatStateRepo.findByChatId(mockMessageRequest.getChatId()))
             .thenReturn(Optional.empty());
 
-        when(mockScrapperClient.registerChat(CHAT_ID)).thenReturn(Mono.empty());
-
         MessageResponse actualResponse = startCommand.handle(mockMessageRequest);
 
         String expectedResponseText = "Welcome to the Link Tracker Bot!";

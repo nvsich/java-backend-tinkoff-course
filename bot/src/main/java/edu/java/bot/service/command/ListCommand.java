@@ -1,7 +1,7 @@
 package edu.java.bot.service.command;
 
 import edu.java.bot.api.client.ScrapperClient;
-import edu.java.bot.dto.response.LinkResponse;
+import edu.java.bot.dto.response.ListLinkResponse;
 import edu.java.bot.entity.ChatState;
 import edu.java.bot.entity.MessageRequest;
 import edu.java.bot.entity.MessageResponse;
@@ -37,29 +37,27 @@ public class ListCommand implements Command {
 
         chatState.setChatStatus(ChatStatus.WAITING_FOR_COMMAND);
 
+        ListLinkResponse listLinkResponse;
         try {
-            var listLinkResponseFromClient = scrapperClient.getAllLinksForChat(chatId).block();
-
-            if (listLinkResponseFromClient == null) {
-                return new MessageResponse(chatId, NOT_TRACKING_TEXT);
-            }
-
-            var listLinkResponse = listLinkResponseFromClient.getLinks();
-
-            if (listLinkResponse.isEmpty()) {
-                return new MessageResponse(chatId, NOT_TRACKING_TEXT);
-            }
-
-            StringBuilder stringBuilder = new StringBuilder("Current tracking links:\n");
-            for (LinkResponse linkResponse : listLinkResponse) {
-                String url = linkResponse.getUrl().toString();
-                stringBuilder.append(url).append('\n');
-            }
-
-            return new MessageResponse(chatId, stringBuilder.toString());
-
+            listLinkResponse = scrapperClient.getAllLinksForChat(chatId);
         } catch (IncorrectRequestParamsException e) {
             return new MessageResponse(chatId, e.getMessage());
         }
+
+        return new MessageResponse(chatId, processLinks(listLinkResponse));
+    }
+
+    private String processLinks(ListLinkResponse links) {
+        if (links == null || links.getLinks().isEmpty()) {
+            return NOT_TRACKING_TEXT;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder("Current tracking links:\n");
+        for (var link : links.getLinks()) {
+            var url = link.getUrl().toString();
+            stringBuilder.append(url).append('\n');
+        }
+
+        return stringBuilder.toString();
     }
 }

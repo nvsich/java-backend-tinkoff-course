@@ -61,8 +61,6 @@ class ListCommandTest {
         when(mockChatStateRepo.findByChatId(mockMessageRequest.getChatId()))
             .thenReturn(Optional.ofNullable(mockChatState));
 
-        when(mockScrapperClient.getAllLinksForChat(CHAT_ID)).thenReturn(Mono.empty());
-
         MessageResponse actualResponse = listCommand.handle(mockMessageRequest);
 
         String expectedResponseText = "You are not tracking any links yet";
@@ -105,7 +103,7 @@ class ListCommandTest {
         var listLinkResponse = new ListLinkResponse();
         listLinkResponse.setLinks(List.of(linkResponse));
 
-        when(mockScrapperClient.getAllLinksForChat(CHAT_ID)).thenReturn(Mono.just(listLinkResponse));
+        when(mockScrapperClient.getAllLinksForChat(CHAT_ID)).thenReturn(listLinkResponse);
 
         MessageResponse actualResponse = listCommand.handle(mockMessageRequest);
 

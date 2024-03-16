@@ -1,7 +1,7 @@
 package edu.java.bot.service.command;
 
 import edu.java.bot.api.client.ScrapperClient;
-import edu.java.bot.dto.request.RemoveLinkRequest;
+import edu.java.bot.dto.request.DeleteLinkRequest;
 import edu.java.bot.entity.ChatState;
 import edu.java.bot.entity.MessageRequest;
 import edu.java.bot.entity.MessageResponse;
@@ -50,8 +50,8 @@ public class UntrackCommand implements Command {
             );
 
             try {
-                var removeLinkRequest = new RemoveLinkRequest(request.getText());
-                var linkResponse = scrapperClient.deleteLinkForChat(chatId, removeLinkRequest).block();
+                var removeLinkRequest = new DeleteLinkRequest(request.getText());
+                var linkResponse = scrapperClient.deleteLinkForChat(chatId, removeLinkRequest);
 
                 return new MessageResponse(
                     chatId,

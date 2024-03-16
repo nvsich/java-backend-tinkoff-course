@@ -1,7 +1,7 @@
 package edu.java.bot.service.command;
 
 import edu.java.bot.api.client.ScrapperClient;
-import edu.java.bot.dto.request.RemoveLinkRequest;
+import edu.java.bot.dto.request.DeleteLinkRequest;
 import edu.java.bot.dto.response.LinkResponse;
 import edu.java.bot.entity.ChatState;
 import edu.java.bot.entity.MessageRequest;
@@ -91,11 +91,11 @@ class UntrackCommandTest {
         when(mockChatStateRepo.findByChatId(messageRequest.getChatId()))
             .thenReturn(Optional.of(tChatState));
 
-        var tRemoveLinkRequest = new RemoveLinkRequest(MESSAGE);
+        var tRemoveLinkRequest = new DeleteLinkRequest(MESSAGE);
         var tLinkResponse = new LinkResponse();
         URI tUri = new URI(MESSAGE);
         tLinkResponse.setUrl(tUri);
-        when(mockScrapperClient.deleteLinkForChat(CHAT_ID, tRemoveLinkRequest)).thenReturn(Mono.just(tLinkResponse));
+        when(mockScrapperClient.deleteLinkForChat(CHAT_ID, tRemoveLinkRequest)).thenReturn(tLinkResponse);
 
         MessageResponse actualResponse = untrackCommand.handle(messageRequest);
 

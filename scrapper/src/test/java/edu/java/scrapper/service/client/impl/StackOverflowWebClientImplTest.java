@@ -89,10 +89,9 @@ class StackOverflowWebClientImplTest {
             "application/json"
         ).withBody(mockResponse)));
 
-        Mono<StackOverflowQuestionResponse> actualResponse =
-            stackOverflowWebClient.fetchQuestion(String.valueOf(tQuestionId));
+        var actualResponse = stackOverflowWebClient.fetchQuestion(String.valueOf(tQuestionId));
 
-        StepVerifier.create(actualResponse).assertNext(response -> {
+        StepVerifier.create(Mono.just(actualResponse)).assertNext(response -> {
             assertEquals(1, response.itemList().size(), "itemList should contain one item");
             var item = response.itemList().getFirst();
             assertEquals(tIsAnswered, item.isAnswered(), "isAnswered status should match");

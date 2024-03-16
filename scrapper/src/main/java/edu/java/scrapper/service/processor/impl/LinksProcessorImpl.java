@@ -6,13 +6,11 @@ import edu.java.scrapper.entity.enums.LinkDomain;
 import edu.java.scrapper.entity.factory.LinkFactory;
 import edu.java.scrapper.exception.ChatNotFoundException;
 import edu.java.scrapper.exception.LinkDomainNotSupportedException;
-import edu.java.scrapper.exception.LinkIsNotReachableException;
 import edu.java.scrapper.exception.LinkNotFoundException;
 import edu.java.scrapper.exception.LinkSyntaxException;
 import edu.java.scrapper.repo.ChatRepo;
 import edu.java.scrapper.repo.LinkRepo;
 import edu.java.scrapper.service.processor.LinksProcessor;
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -53,14 +51,7 @@ public class LinksProcessorImpl implements LinksProcessor {
             throw new ChatNotFoundException(CHAT_NOT_FOUND);
         }
 
-        Link link;
-        try {
-            link = linkFactory.createLink(url);
-        } catch (URISyntaxException e) {
-            throw new LinkSyntaxException(e.getMessage());
-        } catch (ConnectException e) {
-            throw new LinkIsNotReachableException(e.getMessage());
-        }
+        Link link = linkFactory.createLink(url);
 
         if (link.getLinkDomain().equals(LinkDomain.NOT_SUPPORTED)) {
             throw new LinkDomainNotSupportedException("This domain is not supported");
