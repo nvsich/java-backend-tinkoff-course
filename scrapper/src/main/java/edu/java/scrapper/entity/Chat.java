@@ -8,10 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "chats")
 public class Chat {
     @Id
@@ -22,6 +26,4 @@ public class Chat {
     @Column(name = "chat_id")
     private Long chatId;
 
-    @ElementCollection
-    private Set<Long> linkIds;
 }

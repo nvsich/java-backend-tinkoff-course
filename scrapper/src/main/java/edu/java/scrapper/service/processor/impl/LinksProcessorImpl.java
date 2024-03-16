@@ -40,7 +40,8 @@ public class LinksProcessorImpl implements LinksProcessor {
             throw new ChatNotFoundException(CHAT_NOT_FOUND);
         }
 
-        return linkRepo.findAllById(chat.get().getLinkIds());
+        //return linkRepo.findAllById(chat.get().getLinkIds());
+        return null;
     }
 
     @Override
@@ -57,8 +58,8 @@ public class LinksProcessorImpl implements LinksProcessor {
             throw new LinkDomainNotSupportedException("This domain is not supported");
         }
 
-        chat.get().getLinkIds().add(link.getId());
-        link.getChatIds().add(chatId);
+        /*chat.get().getLinkIds().add(link.getId());
+        link.getChatIds().add(chatId);*/
 
         return link;
     }
@@ -85,7 +86,7 @@ public class LinksProcessorImpl implements LinksProcessor {
             throw new LinkNotFoundException("Link not found");
         }
 
-        chat.get().getLinkIds().remove(link.get().getId());
+//        chat.get().getLinkIds().remove(link.get().getId());
 
         return link.get();
     }

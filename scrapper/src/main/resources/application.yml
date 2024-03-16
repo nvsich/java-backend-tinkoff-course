@@ -11,6 +11,14 @@ provider:
     baseUrl: "https://api.stackexchange.com/2.3"
 
 spring:
+  liquibase:
+    change-log: classpath:migrations/master.xml
+    enabled: true
+  datasource:
+    url: jdbc:postgresql://postgresql-scrapper:5432/scrapper
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
   application:
     name: scrapper
 
