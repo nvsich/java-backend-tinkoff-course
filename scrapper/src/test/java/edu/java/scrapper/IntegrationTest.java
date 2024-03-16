@@ -37,7 +37,7 @@ public abstract class IntegrationTest {
         runMigrations(POSTGRES);
     }
 
-    private static void runMigrations(JdbcDatabaseContainer<?> c) {
+    private static void runMigrations(JdbcDatabaseContainer<?> container) {
         Path changelogPath = new File(".")
             .toPath()
             .toAbsolutePath()
@@ -45,7 +45,11 @@ public abstract class IntegrationTest {
 
         String masterXmlPath = "master.xml";
 
-        try (Connection connection = DriverManager.getConnection(c.getJdbcUrl(), c.getUsername(), c.getPassword())) {
+        try (Connection connection = DriverManager.getConnection(
+            container.getJdbcUrl(),
+            container.getUsername(),
+            container.getPassword()
+        )) {
             Database database = DatabaseFactory
                 .getInstance()
                 .findCorrectDatabaseImplementation(new JdbcConnection(connection));
