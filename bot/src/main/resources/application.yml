@@ -2,10 +2,22 @@ app:
   telegram-token: ${BOT_TOKEN}
 
 spring:
+  liquibase:
+    change-log: classpath:migrations/master.xml
+    enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5434/bot
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
   application:
     name: bot
   jackson:
     time-zone: UTC
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
   port: 8090
@@ -20,4 +32,4 @@ springdoc:
 
 client:
   scrapper:
-    baseUrl: "https://localhost:8080/"
+    baseUrl: "http://localhost:8080/"

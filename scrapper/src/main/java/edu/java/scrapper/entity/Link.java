@@ -2,7 +2,6 @@ package edu.java.scrapper.entity;
 
 import edu.java.scrapper.entity.enums.LinkDomain;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -10,11 +9,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.net.URI;
-import java.util.Set;
+import java.time.OffsetDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "links")
 public class Link {
     @Id
@@ -29,7 +32,7 @@ public class Link {
     @Column(name = "url")
     private URI url;
 
-    @ElementCollection
-    private Set<Long> chatIds;
+    @Column(name = "updated_at")
+    private OffsetDateTime updatedAt;
 
 }

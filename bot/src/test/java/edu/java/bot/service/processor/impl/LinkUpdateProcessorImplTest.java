@@ -1,25 +1,21 @@
 package edu.java.bot.service.processor.impl;
 
 import edu.java.bot.dto.request.LinkUpdateRequest;
-import edu.java.bot.entity.MessageResponse;
 import edu.java.bot.exception.InvalidLinkUpdateException;
 import edu.java.bot.telegrambot.Bot;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class LinkUpdateProcessorImplTest {
+class LinkUpdateProcessorImplTest {
 
     @Mock
     private Bot bot;
@@ -27,28 +23,34 @@ public class LinkUpdateProcessorImplTest {
     @InjectMocks
     private LinkUpdateProcessorImpl linkUpdateProcessor;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
-    public void testProcess_ValidRequest() {
+    void process_ValidRequest_SendsMessageToEachChatId() {
         LinkUpdateRequest request = new LinkUpdateRequest();
-        var listIds = List.of(123L, 456L);
-        request.setTgChatIds(listIds);
-        request.setDescription("Test description");
+        request.setTgChatIds(List.of(1L, 2L));
+        request.setDescription("description");
 
         linkUpdateProcessor.process(request);
 
-        verify(bot, times(listIds.size())).sendMessage(any(MessageResponse.class));
+        verify(bot, times(2)).sendMessage(ArgumentMatchers.any());
     }
 
     @Test
-    public void testProcess_InvalidRequest() {
+    void process_NullRequest_ThrowsInvalidLinkUpdateException() {
+        assertThrows(InvalidLinkUpdateException.class, () -> linkUpdateProcessor.process(null));
+    }
+
+    @Test
+    void process_EmptyChatIds_ThrowsInvalidLinkUpdateException() {
         LinkUpdateRequest request = new LinkUpdateRequest();
-        request.setTgChatIds(List.of());
-        request.setDescription("");
+
+        assertThrows(InvalidLinkUpdateException.class, () -> linkUpdateProcessor.process(request));
+    }
+
+    @Test
+    void process_BlankDescription_ThrowsInvalidLinkUpdateException() {
+        LinkUpdateRequest request = new LinkUpdateRequest();
+        request.setTgChatIds(List.of(1L));
+        request.setDescription(" ");
 
         assertThrows(InvalidLinkUpdateException.class, () -> linkUpdateProcessor.process(request));
     }

@@ -1,4 +1,4 @@
-package edu.java.scrapper.service.processor.impl;
+package edu.java.scrapper.service.processor.jdbc;
 
 import edu.java.scrapper.entity.Chat;
 import edu.java.scrapper.exception.ChatIsRegisteredException;
@@ -19,10 +19,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ChatProcessorImplTest {
+public class JdbcChatProcessorTest {
     private ChatRepo mockChatRepo;
 
-    private ChatProcessorImpl chatProcessor;
+    private JdbcChatProcessor chatProcessor;
 
     private static final Long CHAT_ID = 1L;
 
@@ -35,7 +35,7 @@ public class ChatProcessorImplTest {
     @BeforeEach
     void setUp() {
         mockChatRepo = mock(ChatRepo.class);
-        chatProcessor = new ChatProcessorImpl(mockChatRepo);
+        chatProcessor = new JdbcChatProcessor(mockChatRepo);
     }
 
     @Test
