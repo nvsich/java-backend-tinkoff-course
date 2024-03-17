@@ -39,7 +39,6 @@ public class JdbcChatStateRepoTest extends IntegrationTest {
     @Rollback
     void saveAndFindByChatId_ShouldReturnOptionalOfChatState() {
         ChatState chatState = ChatState.builder()
-                .id(1L)
                 .chatId(1L)
                 .chatStatus(ChatStatus.WAITING_FOR_COMMAND)
                 .build();
@@ -55,7 +54,6 @@ public class JdbcChatStateRepoTest extends IntegrationTest {
     @Rollback
     void delete_ShouldDelete() {
         ChatState chatState = ChatState.builder()
-                .id(1L)
                 .chatId(1L)
                 .chatStatus(ChatStatus.WAITING_FOR_LINK_TO_UNTRACK)
                 .build();
