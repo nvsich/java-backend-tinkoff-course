@@ -1,4 +1,4 @@
-package edu.java.scrapper.service.processor.impl;
+package edu.java.scrapper.service.processor.jdbc;
 
 import edu.java.scrapper.entity.Chat;
 import edu.java.scrapper.exception.ChatIsRegisteredException;
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
-public class ChatProcessorImpl implements ChatProcessor {
+public class JdbcChatProcessor implements ChatProcessor {
 
     private ChatRepo chatRepo;
 

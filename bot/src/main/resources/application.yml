@@ -6,7 +6,7 @@ spring:
     change-log: classpath:migrations/master.xml
     enabled: true
   datasource:
-    url: jdbc:postgresql://postgresql-bot:5432/bot
+    url: jdbc:postgresql://localhost:5434/bot
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
@@ -32,4 +32,4 @@ springdoc:
 
 client:
   scrapper:
-    baseUrl: "https://localhost:8080/"
+    baseUrl: "http://localhost:8080/"

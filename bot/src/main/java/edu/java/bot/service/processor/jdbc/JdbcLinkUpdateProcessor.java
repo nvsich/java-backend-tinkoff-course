@@ -1,4 +1,4 @@
-package edu.java.bot.service.processor.impl;
+package edu.java.bot.service.processor.jdbc;
 
 import edu.java.bot.dto.request.LinkUpdateRequest;
 import edu.java.bot.entity.MessageResponse;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class LinkUpdateProcessorImpl implements LinkUpdateProcessor {
+public class JdbcLinkUpdateProcessor implements LinkUpdateProcessor {
 
     private Bot bot;
 

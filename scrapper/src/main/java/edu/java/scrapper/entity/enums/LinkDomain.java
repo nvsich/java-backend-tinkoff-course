@@ -2,7 +2,6 @@ package edu.java.scrapper.entity.enums;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,11 +31,6 @@ public enum LinkDomain {
             hashMap.put("repoName", pathSplit[2]);
             return hashMap;
         }
-
-        @Override
-        public String toString() {
-            return "GitHub";
-        }
     },
 
     STACKOVERFLOW {
@@ -61,11 +55,6 @@ public enum LinkDomain {
             var pathSplit = path.split("/");
             hashMap.put("questionId", pathSplit[pathSplit.length - 2]);
             return hashMap;
-        }
-
-        @Override
-        public String toString() {
-            return "StackOverflow";
         }
     },
 

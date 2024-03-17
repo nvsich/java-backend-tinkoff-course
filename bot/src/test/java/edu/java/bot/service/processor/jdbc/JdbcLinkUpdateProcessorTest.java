@@ -1,4 +1,4 @@
-package edu.java.bot.service.processor.impl;
+package edu.java.bot.service.processor.jdbc;
 
 import edu.java.bot.dto.request.LinkUpdateRequest;
 import edu.java.bot.entity.MessageResponse;
@@ -19,13 +19,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class LinkUpdateProcessorImplTest {
+public class JdbcLinkUpdateProcessorTest {
 
     @Mock
     private Bot bot;
 
     @InjectMocks
-    private LinkUpdateProcessorImpl linkUpdateProcessor;
+    private JdbcLinkUpdateProcessor linkUpdateProcessor;
 
     @BeforeEach
     public void setUp() {

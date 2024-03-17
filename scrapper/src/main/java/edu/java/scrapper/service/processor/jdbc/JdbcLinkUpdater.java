@@ -1,4 +1,4 @@
-package edu.java.scrapper.service.processor.impl;
+package edu.java.scrapper.service.processor.jdbc;
 
 import edu.java.scrapper.api.client.BotClient;
 import edu.java.scrapper.dto.request.LinkUpdateRequest;
@@ -17,22 +17,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
-public class LinkUpdaterImpl implements LinkUpdater {
+public class JdbcLinkUpdater implements LinkUpdater {
 
+    private static final Duration OUTDATED_LINKS_INTERVAL = Duration.ofMinutes(10);
     private LinkRepo linkRepo;
     private ChatLinkRepo chatLinkRepo;
     private GitHubWebClient gitHubWebClient;
     private StackOverflowWebClient stackOverflowWebClient;
     private BotClient botClient;
 
-    private static final Duration outdatedLinksInterval = Duration.ofMinutes(10);
-
     @Override
     @Transactional
     public int update() {
         var updatesCount = 0;
 
-        var outdatedLinks = linkRepo.findOutdatedLinks(outdatedLinksInterval);
+        var outdatedLinks = linkRepo.findOutdatedLinks(OUTDATED_LINKS_INTERVAL);
 
         for (var link : outdatedLinks) {
             var lastUpdatedAt = switch (link.getLinkDomain()) {

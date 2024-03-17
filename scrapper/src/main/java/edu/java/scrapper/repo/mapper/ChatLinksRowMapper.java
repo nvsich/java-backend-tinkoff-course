@@ -1,9 +1,9 @@
 package edu.java.scrapper.repo.mapper;
 
 import edu.java.scrapper.entity.ChatLink;
-import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.springframework.jdbc.core.RowMapper;
 
 public class ChatLinksRowMapper implements RowMapper<ChatLink> {
     @Override

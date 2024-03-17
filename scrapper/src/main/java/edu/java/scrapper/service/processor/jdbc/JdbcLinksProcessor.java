@@ -1,4 +1,4 @@
-package edu.java.scrapper.service.processor.impl;
+package edu.java.scrapper.service.processor.jdbc;
 
 import edu.java.scrapper.entity.Chat;
 import edu.java.scrapper.entity.Link;
@@ -6,7 +6,6 @@ import edu.java.scrapper.entity.enums.LinkDomain;
 import edu.java.scrapper.entity.factory.LinkFactory;
 import edu.java.scrapper.exception.ChatNotFoundException;
 import edu.java.scrapper.exception.LinkDomainNotSupportedException;
-import edu.java.scrapper.exception.LinkExistsException;
 import edu.java.scrapper.exception.LinkNotFoundException;
 import edu.java.scrapper.exception.LinkSyntaxException;
 import edu.java.scrapper.repo.ChatLinkRepo;
@@ -23,19 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
-public class LinksProcessorImpl implements LinksProcessor {
-
-    private LinkRepo linkRepo;
-
-    private ChatRepo chatRepo;
-
-    private ChatLinkRepo chatLinkRepo;
-
-    private LinkFactory linkFactory;
+public class JdbcLinksProcessor implements LinksProcessor {
 
     private static final String CHAT_NOT_FOUND = "Chat not found";
     private static final String HTTP = "http://";
     private static final String HTTPS = "https://";
+    private LinkRepo linkRepo;
+    private ChatRepo chatRepo;
+    private ChatLinkRepo chatLinkRepo;
+    private LinkFactory linkFactory;
 
     @Override
     @Transactional
@@ -64,11 +59,8 @@ public class LinksProcessorImpl implements LinksProcessor {
             throw new LinkDomainNotSupportedException("This domain is not supported");
         }
 
-        if (linkRepo.findByUrl(link.getUrl()).isPresent()) {
-            throw new LinkExistsException("This link is already being tracked");
-        }
-
-        chatLinkRepo.save(chatId, link.getId());
+        linkRepo.save(link);
+        chatLinkRepo.save(chatId, linkRepo.findByUrl(link.getUrl()).get().getId());
         return link;
     }
 

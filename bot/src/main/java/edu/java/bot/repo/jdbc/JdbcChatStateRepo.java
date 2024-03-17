@@ -14,15 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class JdbcChatStateRepo implements ChatStateRepo {
 
-    private JdbcTemplate jdbcTemplate;
-
     private static final String SQL_FIND_BY_CHAT_ID = "SELECT * FROM chat_states WHERE chat_id = ?";
-
-    private static final String SQL_SAVE = "INSERT INTO chat_states (chat_id, chat_status) VALUES (?, ?)";
-
+    private static final String SQL_SAVE =
+        "INSERT INTO chat_states (chat_id, chat_status) VALUES (?, ?) "
+            + "ON CONFLICT (chat_id) DO UPDATE SET chat_status = ?";
     private static final String SQL_DELETE = "DELETE FROM chat_states WHERE chat_id = ?";
-
     private static final String SQL_FIND_ALL = "SELECT * FROM chat_states";
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     @Transactional(readOnly = true)
@@ -35,8 +33,10 @@ public class JdbcChatStateRepo implements ChatStateRepo {
     @Override
     @Transactional
     public void save(ChatState chatState) {
-        jdbcTemplate.update(SQL_SAVE,
+        jdbcTemplate.update(
+            SQL_SAVE,
             chatState.getChatId(),
+            chatState.getChatStatus().name(),
             chatState.getChatStatus().name()
         );
     }

@@ -2,11 +2,11 @@ package edu.java.scrapper.repo.mapper;
 
 import edu.java.scrapper.entity.Link;
 import edu.java.scrapper.entity.enums.LinkDomain;
-import org.springframework.jdbc.core.RowMapper;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import org.springframework.jdbc.core.RowMapper;
 
 public class LinkRowMapper implements RowMapper<Link> {
     @Override
