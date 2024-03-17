@@ -16,7 +16,9 @@ public class LinkUpdateProcessorImpl implements LinkUpdateProcessor {
 
     @Override
     public void process(LinkUpdateRequest linkUpdateRequest) {
-        if (linkUpdateRequest == null || linkUpdateRequest.getTgChatIds().isEmpty()
+        if (linkUpdateRequest == null
+            || linkUpdateRequest.getTgChatIds() == null
+            || linkUpdateRequest.getTgChatIds().isEmpty()
             || linkUpdateRequest.getDescription().isBlank()) {
             throw new InvalidLinkUpdateException("Invalid LinkUpdateRequest");
         }
