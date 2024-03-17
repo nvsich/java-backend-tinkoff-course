@@ -1,4 +1,4 @@
-package edu.java.bot.service.processor.jdbc;
+package edu.java.bot.service.processor.impl;
 
 import edu.java.bot.entity.MessageRequest;
 import edu.java.bot.entity.MessageResponse;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class JdbcUserMessageProcessor implements UserMessageProcessor {
+public class UserMessageProcessorImpl implements UserMessageProcessor {
 
     private List<Command> commands;
 

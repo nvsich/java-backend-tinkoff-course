@@ -3,6 +3,7 @@ package edu.java.bot.service.processor.jdbc;
 import edu.java.bot.dto.request.LinkUpdateRequest;
 import edu.java.bot.entity.MessageResponse;
 import edu.java.bot.exception.InvalidLinkUpdateException;
+import edu.java.bot.service.processor.impl.LinkUpdateProcessorImpl;
 import edu.java.bot.telegrambot.Bot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +20,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class JdbcLinkUpdateProcessorTest {
+public class LinkUpdateProcessorImplTest {
 
     @Mock
     private Bot bot;
 
     @InjectMocks
-    private JdbcLinkUpdateProcessor linkUpdateProcessor;
+    private LinkUpdateProcessorImpl linkUpdateProcessor;
 
     @BeforeEach
     public void setUp() {
